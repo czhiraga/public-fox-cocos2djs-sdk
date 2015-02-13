@@ -19,5 +19,4 @@
 
 ![フレームワーク設定02](https://github.com/cyber-z/public_fox_ios_sdk/raw/master/doc/config_framework/ja/img02.png)
 
-[TOP](https://github.com/cyber-z/public_fox_ios_sdk#2-%E8%A8%AD%E5%AE%9A)
 
