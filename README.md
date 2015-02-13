@@ -216,8 +216,6 @@ SDKの動作に必要な設定をplistに追加します。「AppAdForce.plist�
 
 ##3.2	プロジェクトへの導入
 
-既にアプリケーションにSDKが導入されている場合には、[最新バージョンへのアップデートについて](./doc/update/ja)をご参照ください。
-
 ダウンロードしたSDK「FOX_Android_SDK_<version>.zip」を展開し、「AppAdForce.jar」をアプリケーションのプロジェクトに組み込んでください。
 
 #### Eclipseプロジェクトへの導入
@@ -274,7 +272,52 @@ Force Operation X SDKの実行に必要な情報を<application>タグ内に追�
 		</intent-filter>
 	</receiver>
 
-既に"com.android.vending.INSTALL_REFERRER"に対するレシーバークラスが定義されている場合には、[二つのINSTALL_REFERRERレシーバーを共存させる場合の設定](https://github.com/cyber-z/public_fox_android_sdk/blob/master/doc/install_referrer/ja/README.md)をご参照ください。
+#### 複数のBroadCastReceiverを共存させる方法
+
+既に"com.android.vending.INSTALL_REFERRER"に対するレシーバークラスが定義されている場合には、以下のように実装することで共存させることが出来ます。<br>
+一つ軸となるレシーバークラスを定義し、そのクラス内で直列に各レシーバーを呼び出すようにします。
+
+[実装例]
+
+* MyReceiverクラス（クラス名は好きに変更して頂いて構いません）
+
+```java
+public class MyReceiver extends BroadcastReceiver {
+	// F.O.XのINSTALL_REFERRERレシーバー
+   jp.appAdForce.android.InstallReceiver foxReceiver;
+
+   // F.O.X以外のINSTALL_REFERRERレシーバー
+   jp.co.android.sample.InstallReceiver thirdPartyReceiver;
+   jp.co.android.sample.InstallReceiver2 thirdPartyReceiver2;
+
+   public MyReceiver() {
+      foxReceiver = new jp.appAdForce.android.InstallReceiver();
+      thirdPartyReceiver = new jp.co.android.sample.InstallReceiver();
+      thirdPartyReceiver2 = jp.co.android.sample.InstallReceiver2();
+   }
+   @Override
+   public void onReceive(Context context, Intent intent){
+       foxReceiver.onReceive(context, intent);
+
+       thirdPartyReceiver.onReceive(context, intent);
+
+       thirdPartyReceiver2.onReceive(context, intent);
+   }
+}
+```
+
+* AndroidManifest.xml
+
+```xml
+<receiver
+       android:name="jp.co.sample.android.receiver.MyReceiver"
+       android:exported="true" >
+       <intent-filter>
+            <action android:name="com.android.vending.INSTALL_REFERRER" />
+       </intent-filter>
+</receiver>
+```
+
 
 ###3.3.4 AndroidManifest.xmlに関連するその他の設定
 
@@ -342,7 +385,7 @@ Google Play Services のライブラリプロジェクトを取得し�
 
 ##### Google Play Servicesを利用するための設定
 
-##### AndroidManifest.xmlの編集
+###### [AndroidManifest.xmlの編集]
 
 Google Play Servicesを利用するために下記の設定をAndroidManifest.xmlの<application>タグ内に記述します。
 
@@ -351,7 +394,7 @@ Google Play Servicesを利用するために下記の設定をAndroidManifest.xm
         android:value="@integer/google_play_services_version" />
 ```
 
-###### Proguardの設定
+###### [Proguardの設定]
 
 Proguardを利用して難読化している場合は、以下の設定を追加してください。
 
@@ -381,7 +424,7 @@ Proguardを利用して難読化している場合は、以下の設定を追加
 
 本設定は必須ではありませんが、アプリケーションの再インストールにおける重複検知の精度が大きく向上するため、実装を推奨しております。
 
-##### パーミッションの設定
+###### [パーミッションの設定]
 
 外部ストレージへのファイル読み書きに必要なパーミッションの設定をAndroidManifest.xmlの<manifest>タグ内に追加します。
 
@@ -395,7 +438,7 @@ Proguardを利用して難読化している場合は、以下の設定を追加
 Environment.getExternalStorageDirectory().getPath()で取得できるパス/アプリのパッケージ名/__FOX_XUNIQ__
 ```
 
-##### （任意）保存ディレクトリ及びファイル名の変更
+###### [（任意）保存ディレクトリ及びファイル名の変更]
 
 保存されるファイルのディレクトリ名は、標準ではパッケージ名で作成されますが、<application>タグ内に以下設定を追加することで、任意のディレクトリ名及びファイル名に変更することができます。
 
@@ -410,7 +453,7 @@ Environment.getExternalStorageDirectory().getPath()で取得できるパス/ア�
 通常は設定の必要はありません。
 
 
-##### 設定例
+###### [設定例]
 
 AndroidManifest.xmlの設定例を次に記載します。
 
@@ -434,7 +477,7 @@ AndroidManifest.xmlの設定例を次に記載します。
 Environment.getExternalStorageDirectory().getPath()で取得できるパス/fox_id_dir/fox_id_file
 ```
 
-##### 外部ストレージの利用停止
+###### [外部ストレージの利用停止]
 
 Force Operation X SDKによる外部ストレージへのアクセスを停止したい場合には、AndroidManifest.xmlにAPPADFORCE_USE_EXTERNAL_STORAGEの設定を追加してください。
 ```xml
