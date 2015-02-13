@@ -606,8 +606,8 @@ CC_LTV_PARAM_CURRENCYには[ISO 4217](http://ja.wikipedia.org/wiki/ISO_4217)で�
 
 アクセス解析を導入することで、自然流入・広告流入別の起動数、アクティブユーザー数(DAU/MAU)や継続率を計測することができます。アクセス解析では、アプリケーションが起動、もしくはバックグラウンドから復帰する際にセッション計測を行うコードを追加します。不要の場合には、本項目の実装を省略できます。
 
-####iPhone プロジェクト
-iPhoneの場合、以下の設定が必要です。
+####iOS プロジェクト
+iOSの場合、以下の設定が必要です。
 
 JavaScript上のアプリ起動地点となる箇所に以下を記述してください。
 
@@ -643,10 +643,12 @@ JavaScript上のアプリ起動地点となる箇所に以下を記述してく�
 
 アプリのバックグラウンドからの復帰を計測するために、AppDelegate.cppのapplicationWillEnterForegroundに以下のように記述してください。
 
+	// ヘッダーファイルをインクルード
 	#include “Cocos2dxFox.h”
 	
 ---
 	
+	// 計測用メソッドを実行
 	FoxPlugin::sendStartSession();
 	
 	
